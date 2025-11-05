@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -43,11 +42,15 @@
             padding-right: 1rem;
             max-height: calc(80vh - 80px); /* Adjust height for the full screen view */
         }
-
         /* Ensure smooth scrolling when navigating to 'About' */
         html {
             scroll-behavior: smooth;
         }
+
+        /* Using standard CSS for line-clamp since Tailwind v3 sometimes requires configuration
+           We'll rely on the utility classes, but this is a note for manual debugging. 
+           The line-clamp-6 class is defined by Tailwind's JS and should work.
+        */
     </style>
     <script>
         // Data and Logic for the application
@@ -98,7 +101,12 @@
 
             const mockContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula non magna commodo placerat. Curabitur et sem eu odio luctus pellentesque. Curabitur vitae est.";
             const openingParagraph = "In a world saturated with ephemeral digital content, the simple act of focusing on a singular opinion piece, read in a moment of quiet, becomes a form of resistance. The author argues that true cultural depth requires slow processing, something the 'rolodex' format attempts to enforce by limiting the view to one column at a time.";
-            const longArticleBody = Array(6).fill(`<p>${mockContent}</p>`).join('');
+            
+            // Body text for the full article (long and scrollable)
+            const longArticleBody = Array(15).fill(`<p>${mockContent}</p>`).join('');
+
+            // Body text for the preview card (approx. three paragraphs of plain text)
+            const shortBody = Array(3).fill(mockContent).map(p => p).join(' ');
 
 
             // --- Core Application Logic ---
@@ -123,6 +131,7 @@
                         author: authors[authorIndex], 
                         imageUrl: placeholderImageUrl,
                         preview: openingParagraph, // Standfirst
+                        shortBodyPreview: shortBody, // New plain text body preview
                         content: `${longArticleBody} <p>This is the conclusion for the column published on ${formattedDate}.</p>`
                     });
                 });
@@ -151,18 +160,35 @@
 
                 articleData.forEach(article => {
                     const card = document.createElement('div');
+                    // Added bg-white back and maintained shadow/border
                     card.className = 'article-preview-card p-6 bg-white shadow-xl rounded-3xl border border-gray-100 flex flex-col overflow-hidden';
                     card.setAttribute('data-article-id', article.id);
                     card.onclick = () => navigateToArticle(article.id);
 
                     card.innerHTML = `
-                        <div class="h-48 mb-4 bg-indigo-500 rounded-xl overflow-hidden shadow-md">
+                        <!-- 1. Headline (Title) -->
+                        <h2 class="text-2xl font-extrabold leading-tight mb-2 text-gray-900 line-clamp-2">${article.title}</h2>
+                        
+                        <!-- 2. Byline (Author) + Date -->
+                        <p class="text-sm font-medium text-gray-700 mb-3 border-b border-gray-100 pb-2">
+                            By <span class="font-bold">${article.author}</span>
+                            <span class="text-xs ml-1 text-gray-400 font-normal">| ${article.date}</span>
+                        </p>
+                        
+                        <!-- 3. Standfirst (Preview) -->
+                        <p class="text-base italic text-gray-800 mb-4 line-clamp-3 leading-relaxed">${article.preview}</p>
+
+                        <!-- 4. Main Image -->
+                        <div class="h-40 mb-4 bg-indigo-500 rounded-xl overflow-hidden shadow-md">
                             <img src="${article.imageUrl}" alt="Visual insight for ${article.title}" class="w-full h-full object-cover">
                         </div>
-                        <p class="text-sm font-semibold text-indigo-600 mb-1 tracking-wider uppercase">${article.date}</p>
-                        <h2 class="text-2xl font-extrabold leading-snug mb-3">${article.title}</h2>
-                        <p class="text-gray-500 text-sm overflow-hidden text-ellipsis line-clamp-3">${article.preview}</p>
-                        <div class="mt-4 flex justify-end">
+
+                        <!-- 5. Body Text Preview (New, 3 paragraphs max with fade/ellipsis) -->
+                        <p class="text-sm text-gray-700 mb-4 leading-normal line-clamp-6">
+                            ${article.shortBodyPreview}
+                        </p>
+
+                        <div class="mt-auto flex justify-end">
                             <button class="text-indigo-600 font-medium text-sm hover:text-indigo-800 transition duration-150">
                                 Read Column &rarr;
                             </button>
