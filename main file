@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Culture Columns</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Lora Font (Newspaper/Serif Style) -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
+        body {
+            /* FT-style light pink background */
+            background-color: #FDF6F0;
+            /* Newspaper-y serif font */
+            font-family: 'Lora', serif; 
+            color: #1e293b; /* Slate 800 */
+        }
+        /* Custom styling for the rolodex/carousel container */
+        .rolodex-container {
+            /* Enable horizontal scrolling and snap behavior */
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+        }
+        .article-preview-card {
+            /* Card takes up most of the container width for snapping */
+            flex-shrink: 0;
+            width: 90%; 
+            margin: 0 5%; /* Center the card visually */
+            scroll-snap-align: center; 
+            /* Added transition for hover effect */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .article-preview-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Full article view scroll area */
+        .full-article-content {
+            /* Added vertical padding to give the impression of wider margins */
+            padding-left: 1rem;
+            padding-right: 1rem;
+            max-height: calc(80vh - 80px); /* Adjust height for the full screen view */
+        }
+
+        /* Ensure smooth scrolling when navigating to 'About' */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script>
+        // Data and Logic for the application
+        document.addEventListener('DOMContentLoaded', () => {
+            const appView = document.getElementById('app-view');
+            let selectedArticleId = null;
+            let articleData = [];
+
+            // Placeholder image used for all previews
+            const placeholderImageUrl = "https://placehold.co/400x200/4f46e5/ffffff?text=Cultural+Insight";
+            
+            // --- Helper Functions for Data Generation ---
+
+            const getArticleDates = () => {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = now.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const articleDays = [];
+
+                for (let day = daysInMonth; day >= 1; day--) {
+                    if (articleDays.length >= 30) break;
+                    articleDays.push(new Date(year, month, day));
+                }
+                return articleDays;
+            };
+
+            const titles = [
+                "The Quiet Revolution of the Nap Dress", "Why Analog Audio Is Making a Comeback",
+                "The Ethics of AI Art in the Gallery", "Decoding the Modern Coffee Shop Aesthetic",
+                "Is the 'Third Place' Disappearing?", "The Enduring Appeal of Mid-Century Design",
+                "Rethinking the Commute: A New Urban Ritual", "The Cultural Impact of Vague Social Media Posts",
+                "Minimalism's Maximalist Problem", "The Secret Life of City Pigeons (A Metaphor)",
+                "How Video Games Shape Modern Mythology", "The Unsung Heroes of Public Libraries",
+                "Why We're All Craving 'Cottagecore'", "The Power of a Well-Placed Pause in Conversation",
+                "Is Curation Just Another Form of Consumption?", "The Return of the Hand-Written Letter",
+                "Analyzing the Trend of Oversized Accessories", "The Hidden Poetry in Infrastructure",
+                "When Did Nostalgia Become Our Default Setting?", "Exploring the Aesthetics of 'Digital Detox'",
+                "The Forgotten Art of the Street Vendor Call", "The Psychology Behind Open-Plan Offices",
+                "The New Rules of Dinner Party Etiquette", "The Last Great Age of Indie Filmmaking",
+                "Why Every City Needs More Fountains", "Deconstructing the 'Perfect' Instagram Feed",
+                "The Philosophy of Slow Travel", "What We Lose When We Only Listen to Algorithms",
+                "The Subtle Art of Declining Invitations", "Finding Beauty in Concrete Architecture"
+            ];
+            
+            const authors = ["Anya Sharma", "Ben Carter", "Chloe Davis", "Dev Patel", "Ella Fitzgerald", "Marcus Liu", "Sophia Torres"];
+
+
+            const mockContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula non magna commodo placerat. Curabitur et sem eu odio luctus pellentesque. Curabitur vitae est.";
+            const openingParagraph = "In a world saturated with ephemeral digital content, the simple act of focusing on a singular opinion piece, read in a moment of quiet, becomes a form of resistance. The author argues that true cultural depth requires slow processing, something the 'rolodex' format attempts to enforce by limiting the view to one column at a time.";
+            const longArticleBody = Array(6).fill(`<p>${mockContent}</p>`).join('');
+
+
+            // --- Core Application Logic ---
+
+            const initializeData = () => {
+                const articleDates = getArticleDates();
+                articleDates.forEach((date, index) => {
+                    const day = date.getDate();
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+                    const titleIndex = index % titles.length;
+                    const authorIndex = index % authors.length;
+
+                    articleData.push({
+                        id: `article-${day}`,
+                        day: day,
+                        date: formattedDate,
+                        title: titles[titleIndex],
+                        author: authors[authorIndex], 
+                        imageUrl: placeholderImageUrl,
+                        preview: openingParagraph, // Standfirst
+                        content: `${longArticleBody} <p>This is the conclusion for the column published on ${formattedDate}.</p>`
+                    });
+                });
+            };
+
+            const navigateToArticle = (id) => {
+                selectedArticleId = id;
+                renderApp();
+                // Scroll to top when opening full article
+                appView.scrollTo({ top: 0, behavior: 'instant' });
+            };
+
+            const navigateToRolodex = () => {
+                selectedArticleId = null;
+                renderApp();
+            };
+
+            const renderRolodex = () => {
+                appView.innerHTML = `
+                    <p class="text-xs text-gray-400 mb-2 italic text-center">← Swipe to view older columns →</p>
+                    <div id="rolodex-container" class="rolodex-container flex w-full h-full overflow-x-scroll snap-x snap-mandatory gap-0 pb-4">
+                        <!-- Preview Cards will be injected here -->
+                    </div>
+                `;
+                const rolodexContainer = document.getElementById('rolodex-container');
+
+                articleData.forEach(article => {
+                    const card = document.createElement('div');
+                    card.className = 'article-preview-card p-6 bg-white shadow-xl rounded-3xl border border-gray-100 flex flex-col overflow-hidden';
+                    card.setAttribute('data-article-id', article.id);
+                    card.onclick = () => navigateToArticle(article.id);
+
+                    card.innerHTML = `
+                        <div class="h-48 mb-4 bg-indigo-500 rounded-xl overflow-hidden shadow-md">
+                            <img src="${article.imageUrl}" alt="Visual insight for ${article.title}" class="w-full h-full object-cover">
+                        </div>
+                        <p class="text-sm font-semibold text-indigo-600 mb-1 tracking-wider uppercase">${article.date}</p>
+                        <h2 class="text-2xl font-extrabold leading-snug mb-3">${article.title}</h2>
+                        <p class="text-gray-500 text-sm overflow-hidden text-ellipsis line-clamp-3">${article.preview}</p>
+                        <div class="mt-4 flex justify-end">
+                            <button class="text-indigo-600 font-medium text-sm hover:text-indigo-800 transition duration-150">
+                                Read Column &rarr;
+                            </button>
+                        </div>
+                    `;
+                    rolodexContainer.appendChild(card);
+                });
+            };
+
+            const renderFullArticleView = (article) => {
+                appView.innerHTML = `
+                    <div class="p-4 sm:p-6 bg-white shadow-xl rounded-3xl border border-gray-100 w-full h-full">
+                        <button id="back-button" class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition duration-150 p-2 rounded-lg hover:bg-indigo-50">
+                            <!-- lucide:arrow-left icon using inline SVG for single-file mandate -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
+                                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+                            </svg>
+                            Back to Rolodex
+                        </button>
+
+                        <!-- Content structure strictly follows: Title, Author/Date, Standfirst, Image, Body -->
+                        <div class="full-article-content overflow-y-auto">
+                            
+                            <!-- 1. Headline (Title) -->
+                            <h1 class="text-4xl font-extrabold leading-snug mb-3 text-gray-900">${article.title}</h1>
+                            
+                            <!-- 2. Byline (Author) + Date -->
+                            <p class="text-base font-medium text-gray-700 mb-4 border-b border-gray-200 pb-2">
+                                By <span class="font-bold">${article.author}</span>
+                                <span class="text-xs ml-2 text-gray-400 font-normal">| Published ${article.date}</span>
+                            </p>
+                            
+                            <!-- 3. Standfirst (Preview) - Distinctive italic style -->
+                            <p class="text-xl italic text-gray-800 mb-6 leading-relaxed">${article.preview}</p>
+                            
+                            <!-- 4. Main Image -->
+                            <div class="h-56 sm:h-72 mb-8 bg-indigo-500 rounded-xl overflow-hidden shadow-lg">
+                                <img src="${article.imageUrl}" alt="Visual insight for ${article.title}" class="w-full h-full object-cover">
+                            </div>
+
+                            <!-- 5. Body Text -->
+                            <div class="space-y-6 text-gray-700 leading-8 text-lg">
+                                ${article.content}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('back-button').onclick = navigateToRolodex;
+            };
+
+            const renderApp = () => {
+                // Clear the main view container
+                appView.innerHTML = '';
+                
+                if (selectedArticleId) {
+                    // Find the article to display
+                    const article = articleData.find(a => a.id === selectedArticleId);
+                    if (article) {
+                        renderFullArticleView(article);
+                    } else {
+                        // Fallback if ID is invalid
+                        navigateToRolodex();
+                    }
+                } else {
+                    renderRolodex();
+                }
+            };
+
+            // 4. Simple Scroll to About Anchor
+            const setupAboutLink = () => {
+                const aboutLink = document.getElementById('about-link');
+                aboutLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.getElementById('about-section').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+
+
+            // Run initialization and initial render
+            initializeData();
+            setupAboutLink();
+            renderApp();
+        });
+    </script>
+</head>
+<body class="min-h-screen pt-4 pb-12">
+
+    <!-- Header & Navigation -->
+    <header class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">The Daily Scroll</h1>
+        <nav>
+            <a href="#about-section" id="about-link" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition duration-150 p-2 rounded-lg hover:bg-indigo-50">
+                About
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Application View Container -->
+    <main class="w-full max-w-xl mx-auto h-[80vh] flex flex-col items-center">
+        <!-- This container handles the conditional rendering of the Rolodex OR the Full Article View -->
+        <div id="app-view" class="w-full h-full">
+            <!-- Content injected by JavaScript -->
+        </div>
+    </main>
+
+    <!-- About Section (Anchored at the bottom) -->
+    <section id="about-section" class="max-w-xl mx-auto mt-16 px-6 sm:px-8 py-8 bg-white shadow-lg rounded-3xl border border-gray-100">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">What is The Daily Scroll?</h2>
+        <div class="space-y-4 text-gray-600">
+            <p>This website is designed as a focused, one-month cultural micro-project. Every day, a new, single opinion column is published, encouraging users to digest one idea fully before moving on.</p>
+            <p>The **preview cards** allow for quick scanning, while clicking expands the article into a **dedicated reading page** for a distraction-free experience.</p>
+            <p class="text-sm text-gray-400">Project concept by [Your Name/Team]. Created with a mobile-first philosophy.</p>
+        </div>
+    </section>
+
+</body>
+</html>
