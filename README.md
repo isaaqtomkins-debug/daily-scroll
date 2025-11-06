@@ -17,6 +17,7 @@
         }
         /* Custom styling for the rolodex/carousel container */
         .rolodex-container {
+            background-color: #FDF6F0;
             /* Enable horizontal scrolling and snap behavior */
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
