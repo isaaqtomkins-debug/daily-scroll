@@ -9,15 +9,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
         body {
-            /* FT-style light pink background */
-            background-color: #FDF6F0;
+            /* Main body background remains white */
+            background-color: white;
             /* Newspaper-y serif font */
             font-family: 'Lora', serif; 
             color: #1e293b; /* Slate 800 */
         }
         /* Custom styling for the rolodex/carousel container */
         .rolodex-container {
-            background-color: #FDF6F0;
             /* Enable horizontal scrolling and snap behavior */
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
@@ -161,8 +160,8 @@
 
                 articleData.forEach(article => {
                     const card = document.createElement('div');
-                    // Added bg-white back and maintained shadow/border
-                    card.className = 'article-preview-card p-6 bg-white shadow-xl rounded-3xl border border-gray-100 flex flex-col overflow-hidden';
+                    // ADDED bg-[#FDF6F0] to give the card a distinct background
+                    card.className = 'article-preview-card p-6 bg-[#FDF6F0] shadow-xl rounded-3xl border border-gray-100 flex flex-col overflow-hidden';
                     card.setAttribute('data-article-id', article.id);
                     card.onclick = () => navigateToArticle(article.id);
 
@@ -201,7 +200,8 @@
 
             const renderFullArticleView = (article) => {
                 appView.innerHTML = `
-                    <div class="p-4 sm:p-6 bg-white shadow-xl rounded-3xl border border-gray-100 w-full h-full">
+                    <!-- ADDED bg-[#FDF6F0] to the full article container -->
+                    <div class="p-4 sm:p-6 bg-[#FDF6F0] shadow-xl rounded-3xl border border-gray-100 w-full h-full">
                         <button id="back-button" class="flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 mb-4 transition duration-150 p-2 rounded-lg hover:bg-indigo-50">
                             <!-- lucide:arrow-left icon using inline SVG for single-file mandate -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
@@ -296,7 +296,8 @@
     </main>
 
     <!-- About Section (Anchored at the bottom) -->
-    <section id="about-section" class="max-w-xl mx-auto mt-16 px-6 sm:px-8 py-8 bg-white shadow-lg rounded-3xl border border-gray-100">
+    <!-- ADDED bg-[#FDF6F0] to the about section -->
+    <section id="about-section" class="max-w-xl mx-auto mt-16 px-6 sm:px-8 py-8 bg-[#FDF6F0] shadow-lg rounded-3xl border border-gray-100">
         <h2 class="text-2xl font-bold mb-4 text-gray-800">What is The Daily Scroll?</h2>
         <div class="space-y-4 text-gray-600">
             <p>This website is designed as a focused, one-month cultural micro-project. Every day, a new, single opinion column is published, encouraging users to digest one idea fully before moving on.</p>
