@@ -79,7 +79,7 @@
             };
 
             const titles = [
-                "The Quiet Revolution of the Nap Dress", "Why Analog Audio Is Making a Comeback",
+                "Zohran Mamdani’s biggest threat is not Donald Trump, it’s the Democratic old guard", "Why Analog Audio Is Making a Comeback",
                 "The Ethics of AI Art in the Gallery", "Decoding the Modern Coffee Shop Aesthetic",
                 "Is the 'Third Place' Disappearing?", "The Enduring Appeal of Mid-Century Design",
                 "Rethinking the Commute: A New Urban Ritual", "The Cultural Impact of Vague Social Media Posts",
@@ -96,14 +96,18 @@
                 "The Subtle Art of Declining Invitations", "Finding Beauty in Concrete Architecture"
             ];
             
-            const authors = ["Anya Sharma", "Ben Carter", "Chloe Davis", "Dev Patel", "Ella Fitzgerald", "Marcus Liu", "Sophia Torres"];
+            const authors = ["Emma Brockes", "Ben Carter", "Chloe Davis", "Dev Patel", "Ella Fitzgerald", "Marcus Liu", "Sophia Torres"];
 
 
             const mockContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis. Sed convallis tristique sem. Proin ut ligula non magna commodo placerat. Curabitur et sem eu odio luctus pellentesque. Curabitur vitae est.";
-            const openingParagraph = "In a world saturated with ephemeral digital content, the simple act of focusing on a singular opinion piece, read in a moment of quiet, becomes a form of resistance. The author argues that true cultural depth requires slow processing, something the 'rolodex' format attempts to enforce by limiting the view to one column at a time.";
+            const openingParagraph = ["The New York mayor-elect sells a political message further to the left than any American politician has dared to in recent memory", "The Subtle Art of Declining Invitations";]
             
             // Body text for the full article (long and scrollable)
-            const longArticleBody = Array(15).fill(`<p>${mockContent}</p>`).join('');
+            const longArticleBody = `
+            <p>This is the actual first paragraph of my column. Use paragraph tags (&lt;p&gt; and &lt;/p&gt;) to wrap each paragraph. This ensures clean, responsive formatting and proper vertical spacing in the article view.</p>
+            <p>If you need bold text, use **&lt;strong&gt;bold text&lt;/strong&gt;** or **&lt;b&gt;bold text&lt;/b&gt;** tags. For links, use **&lt;a href="URL"&gt;link text&lt;/a&gt;**.</p>
+            <p>You can add as many paragraphs here as you need. The browser will handle the scrolling.</p>
+`;
 
             // Body text for the preview card (approx. three paragraphs of plain text)
             const shortBody = Array(3).fill(mockContent).map(p => p).join(' ');
